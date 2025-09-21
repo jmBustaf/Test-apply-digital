@@ -1,12 +1,20 @@
 import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { ScheduleModule } from '@nestjs/schedule';
 import { DatabaseModule } from 'config/database.module';
 import { ProductsModule } from './products/products.module';
 import { ContentfulFeatureModule } from './integrations/contentful/contentful.feature.module';
+import { ScheduleFeatureModule } from './integrations/schedule/schedule.module';
 
 @Module({
-  imports: [DatabaseModule, ProductsModule, ContentfulFeatureModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    DatabaseModule,
+    ProductsModule,
+    ContentfulFeatureModule,
+    ScheduleFeatureModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
