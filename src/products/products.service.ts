@@ -120,6 +120,37 @@ export class ProductsService {
     }
   }
 
+  async softDeleteBySku(rawSku: string): Promise<IReponsesDefault<null>> {
+    const sku = rawSku.toUpperCase();
+    try {
+      const { affected } = await this.productRepo
+        .createQueryBuilder()
+        .update(Product)
+        .set({ isDeleted: true, deletedAt: () => 'NOW()' })
+        .where('"sku" = :sku', { sku })
+        .andWhere('"is_deleted" = FALSE')
+        .execute();
+
+      if (!affected) {
+        return {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Product not found or already deleted',
+          data: null,
+        };
+      }
+
+      this.logger.log(`softDeleteBySku: "${sku}" -> deleted`);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Product deleted successfully',
+        data: null,
+      };
+    } catch (error) {
+      this.logger.error(`Failed to soft-delete by sku "${sku}"`, error as Error);
+      throw new InternalServerErrorException('Failed to delete product by sku');
+    }
+  }
+
   private meta(page: number, limit: number, totalItems: number): PaginatedMeta {
     return {
       page,

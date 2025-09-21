@@ -12,6 +12,11 @@ export interface EnvVars {
   DB_PASSWORD: string;
   DB_NAME: string;
 
+  CONTENTFUL_SPACE_ID: string;
+  CONTENTFUL_ENVIRONMENT: string;
+  CONTENTFUL_DELIVERY_TOKEN: string;
+  CONTENTFUL_CONTENT_TYPE: string;
+
   JWT_SECRET: string;
   JWT_EXPIRES_IN: string;
 }
@@ -25,6 +30,11 @@ export const envValidationSchema = Joi.object<EnvVars>({
   DB_USER: Joi.string().required(),
   DB_PASSWORD: Joi.string().min(1).required(),
   DB_NAME: Joi.string().required(),
+
+  CONTENTFUL_SPACE_ID: Joi.string().required(),
+  CONTENTFUL_ENVIRONMENT: Joi.string().default('master'),
+  CONTENTFUL_DELIVERY_TOKEN: Joi.string().required(),
+  CONTENTFUL_CONTENT_TYPE: Joi.string().required(),
 
   JWT_SECRET: Joi.string(),
   JWT_EXPIRES_IN: Joi.string().default('15m'),
