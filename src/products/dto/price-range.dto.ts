@@ -1,28 +1,19 @@
-import { Transform } from 'class-transformer';
-import { IsInt, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsNumber, IsOptional, Min } from 'class-validator';
+import { ToNumber } from '../../common/decorators/to-number.decorator';
+import { PaginationDto } from './pagination.dto';
+import { MinLteMax } from '../../common/validators/min-lte-max.validator';
 
-export class PriceRangeDto {
-  @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
+export class PriceRangeDto extends PaginationDto {
   @IsOptional()
-  @IsNumber({}, { message: '"minPrice" debe ser numérico' })
+  @ToNumber()
+  @IsNumber()
   @Min(0, { message: '"minPrice" debe ser >= 0' })
   minPrice?: number;
 
-  @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
   @IsOptional()
-  @IsNumber({}, { message: '"maxPrice" debe ser numérico' })
+  @ToNumber()
+  @IsNumber()
   @Min(0, { message: '"maxPrice" debe ser >= 0' })
+  @MinLteMax('minPrice', 'maxPrice', '"minPrice" debe ser <= "maxPrice"')
   maxPrice?: number;
-
-  @Transform(({ value }) => (value === undefined ? 1 : Number(value)))
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  page?: number;
-
-  @Transform(({ value }) => (value === undefined ? 5 : Number(value)))
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  limit?: number;
 }

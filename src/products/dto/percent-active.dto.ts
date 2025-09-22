@@ -1,35 +1,38 @@
-import { IsIn, IsOptional, Matches } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsEnum, IsOptional } from 'class-validator';
+import { TrimEmptyToUndefined } from '../../common/decorators/trim-empty-to-undefined.decorator';
+import { IsYMD } from '../../common/validators/is-ymd.validator';
+import { FromLteTo } from '../../common/validators/from-lte-to.validator'; // usa import relativo si no tienes paths
 
-const EmptyStringToUndefined = () =>
-  Transform(
-    ({ value }: { value: unknown }): string | undefined => {
-      if (value == null) return undefined;
-      if (typeof value !== 'string') return undefined;
-      const trimmed = value.trim();
-      return trimmed === '' ? undefined : trimmed;
-    },
-    { toClassOnly: true },
-  );
+export enum PriceFlag {
+  WITH = 'with',
+  WITHOUT = 'without',
+  ANY = 'any',
+}
+
+export enum DateField {
+  CREATED = 'created',
+  UPDATED = 'updated',
+}
 
 export class PercentActiveDto {
   @IsOptional()
-  @EmptyStringToUndefined()
-  @IsIn(['with', 'without', 'any'])
-  hasPrice?: 'with' | 'without' | 'any';
+  @TrimEmptyToUndefined()
+  @IsEnum(PriceFlag)
+  hasPrice: PriceFlag = PriceFlag.ANY;
 
   @IsOptional()
-  @EmptyStringToUndefined()
-  @IsIn(['created', 'updated'])
-  dateField?: 'created' | 'updated';
+  @TrimEmptyToUndefined()
+  @IsEnum(DateField)
+  dateField: DateField = DateField.UPDATED;
 
   @IsOptional()
-  @EmptyStringToUndefined()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  @TrimEmptyToUndefined()
+  @IsYMD({ message: '"from" debe ser YYYY-MM-DD' })
   from?: string;
 
   @IsOptional()
-  @EmptyStringToUndefined()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  @TrimEmptyToUndefined()
+  @IsYMD({ message: '"to" debe ser YYYY-MM-DD' })
+  @FromLteTo('from', 'to', '"from" no puede ser mayor que "to"')
   to?: string;
 }
