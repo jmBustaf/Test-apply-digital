@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UsersService, LoginEnsureResult } from 'src/users/users.service';
+import { UsersService } from 'src/users/users.service';
 import { JwtPayload } from 'src/interfaces/models.interface';
 import { IReponsesDefault } from 'config/response.interface';
 import { AuthResponseDto } from './dto/login-response.dto';
@@ -20,13 +20,9 @@ export class AuthService {
     try {
       const { userName, password } = loginDto;
       const normalized = userName.trim().toLowerCase();
-      const {
-        id,
-        userName: name,
-        role,
-      }: LoginEnsureResult = await this.users.ensureForLogin(normalized, password);
+      const user = await this.users.ensureForLogin(normalized, password);
 
-      const payload: JwtPayload = { sub: id, userName: name, role };
+      const payload: JwtPayload = { sub: user.id, userName: user.userName, role: user.role };
 
       const token = String(await this.jwt.signAsync(payload));
       const expiresIn = this.config.get<string>('JWT_EXPIRES_IN', '15m');
@@ -37,10 +33,10 @@ export class AuthService {
         message: 'Login successful',
         data: { logged: true, token, expiresIn },
       };
-    } catch (e: unknown) {
-      if (e instanceof HttpException) throw e;
-      const err = e as Error;
-      this.logger.error(`AuthService.login error: ${err.message}`, err.stack);
+    } catch (err: unknown) {
+      if (err instanceof HttpException) throw err;
+      const e = err as Error;
+      this.logger.error(`AuthService.login error: ${e.message}`, e.stack);
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
