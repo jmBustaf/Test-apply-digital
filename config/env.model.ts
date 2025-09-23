@@ -22,6 +22,8 @@ export interface EnvVars {
 
   SYNC_JOB_NAME: string;
   SYNC_INTERVAL_MS: number;
+
+  BCRYPT_SALT_ROUNDS: number;
 }
 
 export const envValidationSchema = Joi.object<EnvVars>({
@@ -46,4 +48,6 @@ export const envValidationSchema = Joi.object<EnvVars>({
   SYNC_INTERVAL_MS: Joi.number()
     .positive()
     .default(60 * 60 * 1000),
+
+  BCRYPT_SALT_ROUNDS: Joi.number().integer().min(4).default(10),
 });
