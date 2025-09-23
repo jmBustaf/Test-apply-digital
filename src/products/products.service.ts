@@ -28,7 +28,7 @@ export class ProductsService {
 
   private orderAndPaginate(qb: SelectQueryBuilder<Product>, page: number, limit: number) {
     return qb
-      .orderBy('p."created_at"', 'DESC') // usar nombre físico de columna
+      .orderBy('p."created_at"', 'DESC')
       .addOrderBy('p."id"', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
@@ -133,7 +133,7 @@ export class ProductsService {
     try {
       const raw = await this.productRepository
         .createQueryBuilder('p')
-        .withDeleted() // total = activos + eliminados
+        .withDeleted()
         .select('COUNT(*)', 'total')
         .addSelect(
           `SUM(CASE WHEN (p."is_deleted" = TRUE OR p."deleted_at" IS NOT NULL) THEN 1 ELSE 0 END)`,

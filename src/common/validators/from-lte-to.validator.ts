@@ -21,7 +21,7 @@ export function FromLteTo(
           const f = obj[fKey] as string | undefined;
           const t = obj[tKey] as string | undefined;
 
-          if (!f || !t) return true; // si falta uno, no aplicamos
+          if (!f || !t) return true;
           return f <= t;
         },
         defaultMessage(): string {

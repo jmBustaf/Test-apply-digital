@@ -1,6 +1,10 @@
 import { Exclude } from 'class-transformer';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
+export enum Role {
+  USER = 'user',
+}
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -14,8 +18,12 @@ export class User {
   @Column({ select: false })
   password!: string;
 
-  @Column({ type: 'varchar', length: 10, default: 'user' })
-  role!: 'admin' | 'user';
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role!: Role;
 
   @CreateDateColumn()
   createdAt!: Date;

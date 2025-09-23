@@ -9,9 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { User } from './entities/user.entity';
-
-type Role = User['role'];
+import { User, Role } from './entities/user.entity';
 
 export type LoginEnsureResult = {
   id: string;
@@ -46,7 +44,7 @@ export class UsersService {
       return {
         id: existing.id,
         userName: existing.userName,
-        role: 'user',
+        role: Role.USER,
         created: false,
       };
     }
@@ -55,10 +53,14 @@ export class UsersService {
     const hashed = await bcrypt.hash(plainPassword, rounds);
 
     try {
-      const entity = this.userRepo.create({ userName, password: hashed, role: 'user' as Role });
+      const entity = this.userRepo.create({
+        userName,
+        password: hashed,
+        role: Role.USER,
+      });
       const saved = await this.userRepo.save(entity);
       this.logger.log(`User created on first login: ${saved.userName} (id: ${saved.id})`);
-      return { id: saved.id, userName: saved.userName, role: 'user', created: true };
+      return { id: saved.id, userName: saved.userName, role: Role.USER, created: true };
     } catch (err: any) {
       if (err?.code === '23505' || err?.code === 'ER_DUP_ENTRY') {
         const now = await this.userRepo
@@ -72,7 +74,12 @@ export class UsersService {
         const withPwd = now as User & { password: string };
         const ok = await bcrypt.compare(plainPassword, withPwd.password);
         if (!ok) throw new UnauthorizedException('Invalid credentials');
-        return { id: now.id, userName: now.userName, role: 'user', created: false };
+        return {
+          id: now.id,
+          userName: now.userName,
+          role: Role.USER,
+          created: false,
+        };
       }
       throw err;
     }
