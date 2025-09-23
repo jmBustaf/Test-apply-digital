@@ -28,7 +28,7 @@ export class AuthService {
 
       const payload: JwtPayload = { sub: id, userName: name, role };
 
-      const token = (await this.jwt.signAsync(payload)) as string;
+      const token = String(await this.jwt.signAsync(payload));
       const expiresIn = this.config.get<string>('JWT_EXPIRES_IN', '15m');
 
       this.logger.log(`User ${normalized} logged in`);

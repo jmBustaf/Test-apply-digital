@@ -39,6 +39,7 @@
     "contentful": "^11.7.19",
     "cron": "^4.3.3",
     "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
@@ -62,7 +63,7 @@
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.8",
     "cross-env": "^10.0.0",
-    "eslint": "^9.18.0",
+    "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
@@ -76,7 +77,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
+    "typescript-eslint": "^8.44.1"
   },
   "jest": {
     "moduleFileExtensions": [
