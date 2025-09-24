@@ -31,7 +31,21 @@
     "test:cov:e2e": "jest --config jest.e2e.config.ts --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=html",
     "test:watch": "npm run test:unit:watch",
     "test:debug": "npm run test:unit:debug",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "docker:build": "docker build -t test-products .",
+    "docker:build:dev": "docker build --target development -t test-products:dev .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env test-products",
+    "docker:run:dev": "docker run -p 3000:3000 --env-file .env -v $(pwd):/app test-products:dev",
+    "docker:compose:up": "docker-compose up -d",
+    "docker:compose:up:dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:compose:down": "docker-compose down",
+    "docker:compose:down:dev": "docker-compose -f docker-compose.dev.yml down",
+    "docker:compose:logs": "docker-compose logs -f",
+    "docker:compose:logs:dev": "docker-compose -f docker-compose.dev.yml logs -f",
+    "docker:compose:build": "docker-compose build",
+    "docker:compose:build:dev": "docker-compose -f docker-compose.dev.yml build",
+    "docker:compose:restart": "docker-compose restart",
+    "docker:compose:restart:dev": "docker-compose -f docker-compose.dev.yml restart"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

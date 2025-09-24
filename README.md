@@ -94,10 +94,71 @@
 
 ##  Instalación y Configuración
 
-### **Prerrequisitos**
+### ** Docker Implementation Status**
+
+> **Nota del Desarrollador**: Esta es mi primera implementación de Docker en un proyecto profesional. He hecho mi mejor esfuerzo para implementar las mejores prácticas, pero reconozco que puede haber áreas de mejora apesar de que la implementación actual está funcionando y los contenedores están ejecutándose.
+
+#### ** Inicio Rápido con Docker**
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/jmBustaf/Test-apply-digital.git
+cd Test-apply-digital
+
+# 2. Configurar variables de entorno
+cp env.example .env
+# Editar .env con tus valores de Contentful
+
+# 3. Iniciar servicios (producción)
+docker-compose up -d
+
+# 4. Ver logs
+docker-compose logs -f
+
+# 5. Acceder a la aplicación
+# API: http://localhost:3000/api/v1
+# Swagger: http://localhost:3000/api/v1/docs
+```
+
+### **Scripts Docker Disponibles**
+
+```bash
+# Construcción de imágenes
+npm run docker:build              # Imagen de producción
+npm run docker:build:dev          # Imagen de desarrollo
+
+# Ejecución de contenedores
+npm run docker:run                # Ejecutar contenedor de producción
+npm run docker:run:dev            # Ejecutar contenedor de desarrollo
+
+# Docker Compose
+npm run docker:compose:up         # Levantar servicios de producción
+npm run docker:compose:up:dev     # Levantar servicios de desarrollo
+npm run docker:compose:down       # Detener servicios
+npm run docker:compose:logs       # Ver logs
+npm run docker:compose:build      # Construir imágenes
+npm run docker:compose:restart    # Reiniciar servicios
+```
+
+### **Desarrollo con Docker**
+
+```bash
+# Usar docker-compose.dev.yml para desarrollo con hot-reload
+docker-compose -f docker-compose.dev.yml up -d
+
+# La aplicación se recarga automáticamente al cambiar código
+# Base de datos en puerto 5433 para evitar conflictos
+```
+
+### **Prerrequisitos (Desarrollo Local)**
 - Node.js 20.x LTS
 - PostgreSQL 15.x
 - npm
+
+### **💡 Método Recomendado - Desarrollo Local**
+
+> **Para desarrollo, testing y evaluación del proyecto, se recomienda ejecutar localmente:**
+
 
 ### **1. Clonar el Repositorio**
 ```bash
@@ -351,9 +412,11 @@ Los reportes HTML se generan en:
 
 ##  Scripts Disponibles
 
+### ** Scripts Recomendados para Desarrollo**
+
 ```bash
 # Desarrollo
-npm run start:dev          # Modo desarrollo con hot reload
+npm run start:dev          # Modo desarrollo
 npm run start:debug        # Modo debug
 
 # Producción
@@ -509,9 +572,34 @@ Utilizamos Conventional Commits para mensajes consistentes:
 - [x] Autenticación JWT
 - [x] Reportes de métricas avanzados
 
+### **💡 Recomendación de Uso**
+- **Desarrollo/Testing**: Usar `npm run start:dev` (método recomendado)
+- **Producción/Demo**: Usar Docker Compose
+- **Evaluación**: El proyecto funciona mejor en desarrollo local
+
+### ** Estado de Docker Implementation**
+
+#### **✅ Completado (Primera Implementación)**
+
+- [x] **Dockerfile Multi-stage**: Implementado con optimizaciones básicas
+- [x] **Docker Compose**: Configuración funcional para desarrollo y producción
+- [x] **Health Checks**: Monitoreo básico de servicios
+- [x] **Scripts NPM**: Comandos Docker integrados
+- [x] **Documentación**: Guías de uso y troubleshooting
+- [x] **Contenedores Ejecutándose**: PostgreSQL y NestJS funcionando
+
+#### **⚠️ En Progreso / Pendiente**
+
+- [ ] **Conexión API Completa**: Configuración de Contentful para funcionalidad total
+- [ ] **Testing en Contenedores**: Pruebas E2E dentro de Docker
+- [ ] **Optimizaciones Avanzadas**: Mejoras en el Dockerfile
+- [ ] **Logging Estructurado**: Configuración de logs para producción
+- [ ] **Volúmenes Persistentes**: Mejor gestión de datos
+- [ ] **Networking Avanzado**: Configuración de redes personalizadas
+
 ###  **Próximos Pasos**
-- [ ] Dockerización completa
-- [ ] Docker Compose para desarrollo
+- [x] Dockerización completa (Primera implementación)
+- [x] Docker Compose para desarrollo
 - [ ] Despliegue en producción
 - [ ] Monitoreo y logging avanzado
 

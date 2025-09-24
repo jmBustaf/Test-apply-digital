@@ -1,0 +1,97 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  test-docker:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build test image
+      run: |
+        docker build -t test-products:test .
+
+    - name: Test Docker image
+      run: |
+        # Test that the image builds and starts
+        docker run --rm -d --name test-container -p 3000:3000 \
+          -e NODE_ENV=test \
+          -e DB_HOST=localhost \
+          -e DB_PORT=5432 \
+          -e DB_USER=test \
+          -e DB_PASSWORD=test \
+          -e DB_NAME=test \
+          -e CONTENTFUL_SPACE_ID=test \
+          -e CONTENTFUL_DELIVERY_TOKEN=test \
+          -e CONTENTFUL_CONTENT_TYPE=test \
+          -e JWT_SECRET=test-secret \
+          test-products:test
+
+        # Wait for container to start
+        sleep 10
+
+        # Test health endpoint
+        curl -f http://localhost:3000/api/v1/health || exit 1
+
+        # Cleanup
+        docker stop test-container
