@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { ContentfulClientApi, EntrySkeletonType } from 'contentful';
 import { ConfigService } from '@nestjs/config';
 import { CONTENTFUL_CLIENT } from './contentful.module';
-import { Product } from 'src/products/entities/product.entity';
+import { Product } from '../../products/entities/product.entity';
 import { mapContentfulToProduct } from './mappers/product.mapper';
 import { ContentfulProductFields } from './types/product-fields.type';
 

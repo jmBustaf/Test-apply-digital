@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'release/**'
+      - 'hotfix/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'release/**'
+      - 'hotfix/**'
+
+permissions:
+  contents: read
+
+jobs:
+  lint_test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: app_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U test -d app_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      # Variables para tu app en modo test
+      NODE_ENV: test
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_NAME: app_test
+      JWT_SECRET: test_jwt_secret
+      CONTENTFUL_SPACE_ID: test
+      CONTENTFUL_ACCESS_TOKEN: test
+      CONTENTFUL_ENVIRONMENT: master
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js (Active LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Write .env.test
+        run: |
+          cat > .env.test << 'EOF'
+          NODE_ENV=test
+          DB_HOST=localhost
+          DB_PORT=5432
+          DB_USER=test
+          DB_PASSWORD=test
+          DB_NAME=app_test
+          JWT_SECRET=test_jwt_secret
+          CONTENTFUL_SPACE_ID=test
+          CONTENTFUL_ACCESS_TOKEN=test
+          CONTENTFUL_ENVIRONMENT=master
+          EOF
+
+      # (Opcional) si tienes migrations y quieres aplicarlas en CI
+      - name: Run DB migrations (optional)
+        run: |
+          if [ -f node_modules/.bin/typeorm ]; then
+            npx typeorm migration:run || echo "No migrations or CLI not configured"
+          else
+            echo "TypeORM CLI not present, skipping migrations"
+          fi
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests with coverage (JSON summary)
+        run: npm run test:cov:ci
+
+      # Enforce cobertura mínima (statements >= 30%)
+      - name: Enforce coverage >= 30% statements
+        run: |
+          STATEMENTS=$(node -e "console.log((require('./coverage/coverage-summary.json').total.statements.pct)||0)")
+          echo "Statements coverage: $STATEMENTS%"
+          awk "BEGIN {exit !($STATEMENTS >= 30)}" || (echo "Coverage menor a 30%"; exit 1)
+
+      - name: Build
+        run: npm run build
