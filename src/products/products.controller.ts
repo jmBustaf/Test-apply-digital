@@ -1,9 +1,10 @@
-import { Controller, Get, Query, Delete, Param } from '@nestjs/common';
+import { Controller, Get, Query, Delete, Param, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { PriceRangeDto } from './dto/price-range.dto';
 import { PercentActiveDto } from './dto/percent-active.dto';
 import { ByNameDto } from './dto/by-name.dto';
 import { ByCategoryDto } from './dto/by-category.dto';
+import { JwtAuthGuard } from 'config/strategies/jwt-auth.guard';
 
 @Controller('products')
 export class ProductsController {
@@ -24,13 +25,13 @@ export class ProductsController {
     return this.productsService.findByPriceRange(dto);
   }
 
-  //
+  @UseGuards(JwtAuthGuard)
   @Get('percent-deleted')
   getPercentDeleted() {
     return this.productsService.getPercentDeleted();
   }
 
-  //
+  @UseGuards(JwtAuthGuard)
   @Get('percent-active')
   getPercentActive(@Query() dto: PercentActiveDto) {
     return this.productsService.getPercentActive(dto);
