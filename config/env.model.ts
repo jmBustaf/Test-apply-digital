@@ -19,6 +19,9 @@ export interface EnvVars {
 
   JWT_SECRET: string;
   JWT_EXPIRES_IN: string;
+
+  SYNC_JOB_NAME: string;
+  SYNC_INTERVAL_MS: number;
 }
 
 export const envValidationSchema = Joi.object<EnvVars>({
@@ -38,4 +41,9 @@ export const envValidationSchema = Joi.object<EnvVars>({
 
   JWT_SECRET: Joi.string(),
   JWT_EXPIRES_IN: Joi.string().default('15m'),
+
+  SYNC_JOB_NAME: Joi.string().default('contentful-hourly-sync'),
+  SYNC_INTERVAL_MS: Joi.number()
+    .positive()
+    .default(60 * 60 * 1000),
 });
