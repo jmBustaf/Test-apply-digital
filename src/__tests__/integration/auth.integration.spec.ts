@@ -9,7 +9,7 @@ import { AuthModule } from '../../auth/auth.module';
 import { UsersModule } from '../../users/users.module';
 import { User } from '../../users/entities/user.entity';
 import { UserFactory } from '../../test-utils/factories';
-import { IntegrationTestSetup } from '../../test-utils/setup/integration.setup';
+import { IntegrationTestSetup } from '../../test-utils/helpers/integration-test-setup';
 
 describe('Auth Integration Tests', () => {
   let app: INestApplication;

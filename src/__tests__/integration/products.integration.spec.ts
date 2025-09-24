@@ -10,8 +10,8 @@ import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { User } from '../users/entities/user.entity';
 import { Product } from '../products/entities/product.entity';
-import { UserFactory, ProductFactory } from '../test-utils/test-factories';
-import { IntegrationTestSetup } from '../test-utils/integration-test-setup';
+import { UserFactory, ProductFactory } from '../../test-utils/factories';
+import { IntegrationTestSetup } from '../../test-utils/helpers/integration-test-setup';
 
 describe('Products Integration Tests', () => {
   let app: INestApplication;
