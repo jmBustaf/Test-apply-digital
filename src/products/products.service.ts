@@ -15,6 +15,7 @@ import {
   ymdToUtcEndExclusive,
   todayUtcEndExclusive,
 } from '../common/validators/date-range.util';
+import { LowStockDto } from './dto/low-stock.dto';
 
 @Injectable()
 export class ProductsService {
@@ -216,6 +217,68 @@ export class ProductsService {
     } catch (err) {
       this.logger.error('percentActive failed', err as Error);
       throw new InternalServerErrorException('Failed to compute percent active');
+    }
+  }
+
+  async findLowStockByCategory(
+    params: LowStockDto,
+  ): Promise<IReponsesDefault<Array<{ name: string; stock: number }>>> {
+    const { category, threshold, page, limit } = params;
+    const cat = category?.trim();
+
+    try {
+      if (cat && cat.length > 0) {
+        const categoryExists = await this.productRepository
+          .createQueryBuilder('p')
+          .where({ isDeleted: false })
+          .andWhere({ category: ILike(`%${cat}%`) })
+          .getCount();
+
+        if (categoryExists === 0) {
+          this.logger.log(`findLowStockByCategory: categoría no encontrada -> "${cat}"`);
+          return {
+            statusCode: HttpStatus.OK,
+            message: `No existen productos para la categoría "${cat}"`,
+            data: [],
+            meta: this.meta(page, limit, 0),
+          };
+        }
+      }
+
+      const qb = this.productRepository
+        .createQueryBuilder('p')
+        .select(['p.name', 'p.stock'])
+        .where({ isDeleted: false })
+        .andWhere('COALESCE(p.stock, 0) <= :threshold', { threshold });
+
+      if (cat && cat.length > 0) {
+        qb.andWhere({ category: ILike(`%${cat}%`) });
+      }
+
+      this.orderAndPaginate(qb, page, limit);
+      const [products, totalItems] = await qb.getManyAndCount();
+
+      const items: Array<{ name: string; stock: number }> = products.map((product) => ({
+        name: product.name || 'Sin nombre',
+        stock: typeof product.stock === 'number' ? product.stock : 0,
+      }));
+
+      const msg = cat
+        ? `Para la categoría "${cat}", estos productos están próximos a agotarse (stock ≤ ${threshold}).`
+        : `Estos productos están próximos a agotarse (stock ≤ ${threshold}).`;
+      this.logger.log(
+        `findLowStockByCategory: category="${cat ?? '*'}", threshold<=${threshold}, page=${page}, limit=${limit}, total=${totalItems}`,
+      );
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: msg,
+        data: items,
+        meta: this.meta(page, limit, totalItems),
+      };
+    } catch (err) {
+      this.logger.error('findLowStockByCategory failed', err as Error);
+      throw new InternalServerErrorException('Failed to retrieve low-stock products by category');
     }
   }
 

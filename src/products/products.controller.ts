@@ -18,6 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../config/strategies/jwt-auth.guard';
 import { ProductDto } from './dto/product.dto';
+import { LowStockDto } from './dto/low-stock.dto';
 
 @ApiTags('products')
 @ApiExtraModels(ProductDto)
@@ -141,6 +142,43 @@ export class ProductsController {
   @ApiUnauthorizedResponse({ description: 'Sin token o token inválido' })
   getPercentActive(@Query() dto: PercentActiveDto) {
     return this.productsService.getPercentActive(dto);
+  }
+
+  @Get('low-stock')
+  @ApiOperation({ summary: 'Productos por categoría con stock ≤ umbral (paginado)' })
+  @ApiQuery({ name: 'category', type: String, required: false, description: 'Categoría (ILIKE)' })
+  @ApiQuery({
+    name: 'threshold',
+    required: false,
+    type: Number,
+    description: 'Umbral de stock (<= incluye). Default: 20',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiOkResponse({
+    description: 'Listado paginado (solo name y stock)',
+    schema: {
+      type: 'object',
+      properties: {
+        ok: { type: 'boolean' },
+        message: { type: 'string' },
+        data: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: { type: 'string', example: 'Samsung Galaxy A14' },
+              stock: { type: 'number', example: 3 },
+            },
+          },
+        },
+        meta: { $ref: '#/components/schemas/PaginatedMetaDto' },
+      },
+    },
+  })
+  @ApiBadRequestResponse({ description: 'Parámetros inválidos' })
+  getLowStock(@Query() dto: LowStockDto) {
+    return this.productsService.findLowStockByCategory(dto);
   }
 
   @Delete('sku/:sku')

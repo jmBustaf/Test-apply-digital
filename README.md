@@ -40,6 +40,7 @@
 #### **Módulo Público** (Sin autenticación)
 - Búsqueda paginada de productos (máximo 5 items por página)
 - Filtros avanzados por nombre, categoría y rango de precios
+- **Análisis de stock bajo** con validación de categorías
 - Endpoints RESTful optimizados para clientes externos
 
 #### **Módulo Privado** (Con autenticación JWT)
@@ -183,6 +184,23 @@ GET /api/v1/products/category?category=electronics&page=1
 GET /api/v1/products/price-range?minPrice=100&maxPrice=500&page=1
 ```
 
+#### **Productos con Stock Bajo** ⚠️
+```http
+GET /api/v1/products/low-stock?category=Smartphone&threshold=10&page=1&limit=5
+```
+
+**Parámetros:**
+- `category` (opcional): Categoría a buscar (ej: "Smartphone", "Laptop")
+- `threshold` (opcional): Umbral de stock, por defecto 5
+- `page` (opcional): Página, por defecto 1
+- `limit` (opcional): Elementos por página, por defecto 10
+
+**Características:**
+- ✅ **Validación de categoría**: Verifica si la categoría existe
+- ✅ **Respuesta simplificada**: Solo muestra nombre y stock
+- ✅ **Mensaje descriptivo**: Explica la situación del stock
+- ✅ **Búsqueda inteligente**: Si no hay categoría, busca en todas
+
 ### ** Módulo Privado** (Con JWT)
 
 #### **Autenticación**
@@ -239,6 +257,49 @@ Authorization: Bearer <jwt_token>
     "limit": 5,
     "totalItems": 25,
     "totalPages": 5
+  }
+}
+```
+
+#### **Productos con Stock Bajo** ⚠️
+```json
+{
+  "statusCode": 200,
+  "message": "Para la categoría 'Smartphone', estos productos están próximos a agotarse (stock ≤ 10).",
+  "data": [
+    {
+      "name": "Samsung Galaxy A14",
+      "stock": 3
+    },
+    {
+      "name": "iPhone 13 Pro",
+      "stock": 7
+    },
+    {
+      "name": "OnePlus 9",
+      "stock": 2
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 15,
+    "totalPages": 2
+  }
+}
+```
+
+#### **Categoría No Encontrada**
+```json
+{
+  "statusCode": 200,
+  "message": "No existen productos para la categoría 'NoExiste'",
+  "data": [],
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 0,
+    "totalPages": 0
   }
 }
 ```
@@ -375,10 +436,17 @@ Análisis avanzado de productos activos con filtros:
 - **Rango de fechas**: Filtra por fecha de creación o actualización
 - **Conteos detallados**: Muestra números exactos de activos vs totales
 
-### **3. Reporte Personalizado**
-- **Análisis de stock**: Productos con stock bajo
+### **3. Análisis de Stock Bajo** ⚠️
+- **Validación inteligente**: Verifica existencia de categorías
+- **Respuesta optimizada**: Solo datos esenciales (nombre y stock)
+- **Mensajes descriptivos**: Explica la situación del inventario
+- **Búsqueda flexible**: Por categoría específica o todas las categorías
+- **Umbral configurable**: Define qué se considera "stock bajo"
+
+### **4. Reportes Personalizados**
 - **Tendencias de precios**: Análisis de rangos de precios
 - **Categorías más populares**: Estadísticas por categoría
+- **Alertas de inventario**: Notificaciones automáticas de stock bajo
 
 ##  Contribución
 
