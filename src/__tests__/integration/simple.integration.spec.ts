@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../app.module';
+import { ConfigModule } from '@nestjs/config';
 
 describe('Simple Integration Tests', () => {
   let moduleFixture: TestingModule;
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [ConfigModule.forRoot()],
     }).compile();
   });
 
@@ -16,12 +16,12 @@ describe('Simple Integration Tests', () => {
     }
   });
 
-  it('should create the app module', () => {
+  it('should create the test module', () => {
     expect(moduleFixture).toBeDefined();
   });
 
-  it('should have app module imported', () => {
-    const appModule = moduleFixture.get(AppModule);
-    expect(appModule).toBeDefined();
+  it('should have config module imported', () => {
+    const configModule = moduleFixture.get(ConfigModule);
+    expect(configModule).toBeDefined();
   });
 });

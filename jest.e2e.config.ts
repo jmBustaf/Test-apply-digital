@@ -33,6 +33,7 @@ const config: Config = {
     '^@products/(.*)$': '<rootDir>/src/products/$1',
     '^@auth/(.*)$': '<rootDir>/src/auth/$1',
     '^@users/(.*)$': '<rootDir>/src/users/$1',
+    '^config/(.*)$': '<rootDir>/config/$1',
   },
   coverageThreshold: {
     global: {

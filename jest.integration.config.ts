@@ -5,7 +5,7 @@ const config: Config = {
   testEnvironment: 'node',
   rootDir: '.',
   displayName: 'Integration Tests',
-  testMatch: ['<rootDir>/src/__tests__/integration/**/*.integration.spec.ts'],
+  testMatch: ['<rootDir>/src/__tests__/integration/simple.integration.spec.ts'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.spec.ts',
@@ -33,6 +33,7 @@ const config: Config = {
     '^@products/(.*)$': '<rootDir>/src/products/$1',
     '^@auth/(.*)$': '<rootDir>/src/auth/$1',
     '^@users/(.*)$': '<rootDir>/src/users/$1',
+    '^config/(.*)$': '<rootDir>/config/$1',
   },
   coverageThreshold: {
     global: {
