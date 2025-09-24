@@ -25,6 +25,13 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## 🚀 GitHub Actions & GitFlow Status
+
+✅ **GitHub Actions**: Configurado y funcionando
+✅ **GitFlow**: Implementado correctamente
+✅ **Testing**: 82 tests unitarios pasando
+✅ **CI/CD**: Pipeline completo configurado
+
 ## Project setup
 
 ```bash
