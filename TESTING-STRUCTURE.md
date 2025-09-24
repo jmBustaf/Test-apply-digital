@@ -73,6 +73,7 @@ test-products/
 ## 🚀 Scripts Disponibles
 
 ### **Tests Unitarios**
+
 ```bash
 npm run test:unit              # Ejecutar tests unitarios
 npm run test:unit:watch        # Modo watch para unitarios
@@ -81,6 +82,7 @@ npm run test:cov:unit          # Coverage unitarios
 ```
 
 ### **Tests de Integración**
+
 ```bash
 npm run test:integration       # Ejecutar tests de integración
 npm run test:integration:watch # Modo watch para integración
@@ -88,6 +90,7 @@ npm run test:cov:integration   # Coverage integración
 ```
 
 ### **Tests E2E**
+
 ```bash
 npm run test:e2e               # Ejecutar tests E2E
 npm run test:e2e:watch         # Modo watch para E2E
@@ -95,6 +98,7 @@ npm run test:cov:e2e           # Coverage E2E
 ```
 
 ### **Todos los Tests**
+
 ```bash
 npm run test:all               # Ejecutar todos los tests
 npm run test:ci                # Tests para CI/CD
@@ -104,6 +108,7 @@ npm run test:cov               # Coverage completo
 ## 🏗️ Arquitectura de Testing
 
 ### **1. Tests Unitarios (`src/__tests__/unit/`)**
+
 - **Propósito**: Probar lógica de negocio individual
 - **Alcance**: Servicios, controladores, utilidades
 - **Mocking**: Repositorios, servicios externos, dependencias
@@ -111,6 +116,7 @@ npm run test:cov               # Coverage completo
 - **Setup**: `src/test-utils/setup/unit.setup.ts`
 
 ### **2. Tests de Integración (`src/__tests__/integration/`)**
+
 - **Propósito**: Probar interacción entre módulos
 - **Alcance**: Flujos completos con base de datos en memoria
 - **Mocking**: Mínimo, solo servicios externos
@@ -118,6 +124,7 @@ npm run test:cov               # Coverage completo
 - **Setup**: `src/test-utils/setup/integration.setup.ts`
 
 ### **3. Tests E2E (`test/e2e/`)**
+
 - **Propósito**: Probar la aplicación completa
 - **Alcance**: Flujos de usuario end-to-end
 - **Mocking**: Ninguno, aplicación real
@@ -127,6 +134,7 @@ npm run test:cov               # Coverage completo
 ## 🛠️ Utilidades de Testing
 
 ### **Factories Especializadas**
+
 ```typescript
 // UserFactory - Factory para usuarios
 const user = UserFactory.create({ userName: 'testuser' });
@@ -140,6 +148,7 @@ const products = ProductFactory.createMany(3);
 ```
 
 ### **Mocks Centralizados**
+
 ```typescript
 // RepositoryMockFactory - Mocks para repositorios
 const userRepo = RepositoryMockFactory.createUserRepository();
@@ -151,6 +160,7 @@ const jwtService = ServiceMockFactory.createJwtService();
 ```
 
 ### **Helpers Reutilizables**
+
 ```typescript
 // TestDatabaseHelpers - Helpers para base de datos
 TestDatabaseHelpers.mockFindOne(userRepo, user);
@@ -159,18 +169,20 @@ TestDatabaseHelpers.mockSave(productRepo, product);
 // TestAssertionHelpers - Helpers para assertions
 await TestAssertionHelpers.expectToThrowAsync(
   () => service.method(),
-  new UnauthorizedException('Invalid credentials')
+  new UnauthorizedException('Invalid credentials'),
 );
 ```
 
 ## 📊 Coverage y Thresholds
 
 ### **Thresholds por Tipo de Test**
+
 - **Unitarios**: 80% (statements, branches, functions, lines)
 - **Integración**: 70% (statements, branches, functions, lines)
 - **E2E**: 60% (statements, branches, functions, lines)
 
 ### **Exclusiones de Coverage**
+
 - DTOs, entities, interfaces
 - Archivos de configuración
 - Test utilities y helpers
@@ -179,21 +191,23 @@ await TestAssertionHelpers.expectToThrowAsync(
 ## 🎯 Mejores Prácticas Implementadas
 
 ### **1. Naming Conventions**
+
 - **Archivos**: `*.spec.ts` (unitarios), `*.integration.spec.ts`, `*.e2e-spec.ts`
 - **Describe blocks**: Agrupar por funcionalidad
 - **Test cases**: Describir comportamiento esperado
 
 ### **2. Estructura de Tests**
+
 ```typescript
 describe('ServiceName', () => {
   describe('methodName', () => {
     it('should do something when condition', async () => {
       // Arrange
       const input = Factory.create();
-      
+
       // Act
       const result = await service.method(input);
-      
+
       // Assert
       expect(result).toEqual(expected);
     });
@@ -202,11 +216,13 @@ describe('ServiceName', () => {
 ```
 
 ### **3. Setup y Teardown**
+
 - **beforeEach**: Reset mocks y setup consistente
 - **afterEach**: Cleanup si es necesario
 - **beforeAll/afterAll**: Setup/teardown de recursos pesados
 
 ### **4. Factories y Builders**
+
 - Usar factories para datos de prueba consistentes
 - Builders para casos complejos
 - Reset counters para tests determinísticos
@@ -214,6 +230,7 @@ describe('ServiceName', () => {
 ## 🔧 Configuración de Desarrollo
 
 ### **VS Code Settings**
+
 ```json
 {
   "jest.jestCommandLine": "npm run test:unit",
@@ -223,6 +240,7 @@ describe('ServiceName', () => {
 ```
 
 ### **Debugging**
+
 ```bash
 # Debug tests unitarios
 npm run test:unit:debug
@@ -234,6 +252,7 @@ npm run test:unit -- --testNamePattern="should return user when password is corr
 ## 🚀 CI/CD Integration
 
 ### **GitHub Actions Example**
+
 ```yaml
 - name: Run Tests
   run: |
@@ -242,6 +261,7 @@ npm run test:unit -- --testNamePattern="should return user when password is corr
 ```
 
 ### **Pipeline Stages**
+
 1. **Unit Tests**: Rápido, sin dependencias externas
 2. **Integration Tests**: Con base de datos en memoria
 3. **E2E Tests**: Con aplicación completa
@@ -258,6 +278,7 @@ npm run test:unit -- --testNamePattern="should return user when password is corr
 ## 🎉 Resultado Final
 
 Esta estructura profesional te permite:
+
 - ✅ Ejecutar tests de manera granular
 - ✅ Mantener coverage alto y específico
 - ✅ Escalar fácilmente con nuevos módulos

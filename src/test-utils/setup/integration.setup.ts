@@ -1,10 +1,7 @@
-// integration.setup.ts - Setup para tests de integración
 import 'reflect-metadata';
 
-// Increase timeout for integration tests
 jest.setTimeout(30000);
 
-// Mock console methods to reduce noise in tests
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 
@@ -35,7 +32,6 @@ afterAll(() => {
   console.warn = originalConsoleWarn;
 });
 
-// Global test utilities for integration tests
 declare global {
   namespace jest {
     interface Matchers<R> {
@@ -45,7 +41,6 @@ declare global {
   }
 }
 
-// Custom Jest matchers for integration tests
 expect.extend({
   toBeValidJWT(received: string) {
     const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;

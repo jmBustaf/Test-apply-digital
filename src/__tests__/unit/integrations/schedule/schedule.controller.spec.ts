@@ -7,9 +7,7 @@ describe('ScheduleController', () => {
   let scheduleService: jest.Mocked<ScheduleService>;
 
   beforeEach(async () => {
-    const mockScheduleService = {
-      // Add any methods that might be called on the service
-    };
+    const mockScheduleService = {};
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ScheduleController],

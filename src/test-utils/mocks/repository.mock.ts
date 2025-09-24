@@ -1,10 +1,9 @@
-// repository.mock.ts - Mocks especializados para repositorios
 import { Repository } from 'typeorm';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { User } from '../../users/entities/user.entity';
 import { Product } from '../../products/entities/product.entity';
 
-export type MockRepository<T = any> = DeepMockProxy<Repository<T>>;
+export type MockRepository<T extends Record<string, any> = any> = DeepMockProxy<Repository<T>>;
 
 export class RepositoryMockFactory {
   static createUserRepository(): MockRepository<User> {
@@ -15,7 +14,7 @@ export class RepositoryMockFactory {
     return mockDeep<Repository<Product>>();
   }
 
-  static createGenericRepository<T>(): MockRepository<T> {
+  static createGenericRepository<T extends Record<string, any>>(): MockRepository<T> {
     return mockDeep<Repository<T>>();
   }
 

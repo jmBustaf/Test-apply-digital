@@ -1,4 +1,3 @@
-// jest.unit.config.ts - Configuración para tests unitarios
 import type { Config } from 'jest';
 
 const config: Config = {

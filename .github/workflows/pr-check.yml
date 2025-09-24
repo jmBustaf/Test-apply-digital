@@ -1,0 +1,104 @@
+name: 🔍 PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  # 🔍 PR Analysis
+  pr-analysis:
+    name: 🔍 PR Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🔍 Check for TODO/FIXME comments
+        run: |
+          echo "## 🔍 Code Quality Check" >> $GITHUB_STEP_SUMMARY
+          echo "Checking for TODO/FIXME comments..." >> $GITHUB_STEP_SUMMARY
+
+          TODO_COUNT=$(grep -r "TODO\|FIXME" src/ --include="*.ts" --include="*.js" | wc -l || echo "0")
+          echo "Found $TODO_COUNT TODO/FIXME comments" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$TODO_COUNT" -gt 0 ]; then
+            echo "⚠️ Consider addressing TODO/FIXME comments before merging" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No TODO/FIXME comments found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 🔍 Check for console.log statements
+        run: |
+          CONSOLE_COUNT=$(grep -r "console\." src/ --include="*.ts" --include="*.js" | wc -l || echo "0")
+          echo "Found $CONSOLE_COUNT console statements" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$CONSOLE_COUNT" -gt 0 ]; then
+            echo "⚠️ Consider removing console statements before merging" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No console statements found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 🔍 Check for debugger statements
+        run: |
+          DEBUGGER_COUNT=$(grep -r "debugger" src/ --include="*.ts" --include="*.js" | wc -l || echo "0")
+          echo "Found $DEBUGGER_COUNT debugger statements" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$DEBUGGER_COUNT" -gt 0 ]; then
+            echo "⚠️ Consider removing debugger statements before merging" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No debugger statements found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 🔍 Check file sizes
+        run: |
+          echo "## 📊 File Size Analysis" >> $GITHUB_STEP_SUMMARY
+          find src/ -name "*.ts" -exec wc -l {} + | sort -nr | head -10 >> $GITHUB_STEP_SUMMARY
+
+      - name: 📊 PR Analysis Summary
+        if: always()
+        run: |
+          echo "## 🔍 PR Analysis Complete" >> $GITHUB_STEP_SUMMARY
+          echo "✅ PR analysis completed successfully" >> $GITHUB_STEP_SUMMARY
+
+  # 🧪 Quick Test
+  quick-test:
+    name: 🧪 Quick Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🧪 Run quick tests
+        run: npm run test:unit -- --passWithNoTests --watchAll=false
+        env:
+          NODE_ENV: test
+
+      - name: 📊 Quick Test Summary
+        if: always()
+        run: |
+          echo "## 🧪 Quick Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Quick tests completed" >> $GITHUB_STEP_SUMMARY

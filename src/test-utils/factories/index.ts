@@ -1,4 +1,3 @@
-// index.ts - Export all factories
-export * from './user.factory';
-export * from './product.factory';
+export { UserFactory } from './user.factory';
+export { ProductFactory } from './product.factory';
 export * from './base.factory';

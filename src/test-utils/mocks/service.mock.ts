@@ -1,4 +1,3 @@
-// service.mock.ts - Mocks especializados para servicios
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';

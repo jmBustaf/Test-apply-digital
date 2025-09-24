@@ -1,4 +1,3 @@
-// jest.config.ts - Configuración principal (por defecto ejecuta unit tests)
 import type { Config } from 'jest';
 
 const config: Config = {

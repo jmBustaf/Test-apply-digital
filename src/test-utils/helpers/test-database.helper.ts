@@ -1,4 +1,3 @@
-// test-database.helper.ts - Helpers para tests de base de datos
 import { MockRepository } from '../mocks/repository.mock';
 
 export class TestDatabaseHelpers {

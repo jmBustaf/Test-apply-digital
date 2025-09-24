@@ -1,4 +1,3 @@
-// jest.integration.config.ts - Configuración para tests de integración
 import type { Config } from 'jest';
 
 const config: Config = {
@@ -51,7 +50,7 @@ const config: Config = {
   },
   setupFilesAfterEnv: ['<rootDir>/src/test-utils/setup/integration.setup.ts'],
   testTimeout: 30000,
-  maxWorkers: 1, // Run integration tests sequentially
+  maxWorkers: 1,
 };
 
 export default config;

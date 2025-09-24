@@ -1,4 +1,3 @@
-// test-module.helper.ts - Helpers para crear módulos de testing
 import { Test, TestingModule } from '@nestjs/testing';
 
 export class TestModuleBuilder {
@@ -46,10 +45,7 @@ export class TestModuleHelpers {
   }): Promise<TestingModule> {
     return Test.createTestingModule({
       ...config,
-      imports: [
-        ...(config.imports || []),
-        // Add database imports here if needed
-      ],
+      imports: [...(config.imports || [])],
     }).compile();
   }
 }

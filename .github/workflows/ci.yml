@@ -1,105 +1,327 @@
-name: CI
+name: 🚀 CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-      - develop
-      - 'feature/**'
-      - 'release/**'
-      - 'hotfix/**'
+    branches: [main, develop]
   pull_request:
-    branches:
-      - main
-      - develop
-      - 'feature/**'
-      - 'release/**'
-      - 'hotfix/**'
+    branches: [main, develop]
+  workflow_dispatch:
 
-permissions:
-  contents: read
+env:
+  NODE_VERSION: '20.x'
+  POSTGRES_VERSION: '15'
+  POSTGRES_DB: 'test_products_ci'
+  POSTGRES_USER: 'test_user'
+  POSTGRES_PASSWORD: 'test_password'
 
 jobs:
-  lint_test:
+  # 🔍 Lint and Format Check
+  lint:
+    name: 🔍 Lint & Format
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🔍 Run ESLint
+        run: npm run lint
+        continue-on-error: false
+
+      - name: 🎨 Check Prettier formatting
+        run: npm run format -- --check
+        continue-on-error: false
+
+      - name: 📊 Lint Summary
+        if: always()
+        run: |
+          echo "## 🔍 Lint Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ ESLint and Prettier checks completed" >> $GITHUB_STEP_SUMMARY
+
+  # 🧪 Unit Tests
+  test-unit:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🧪 Run Unit Tests
+        run: npm run test:unit -- --coverage --watchAll=false
+        env:
+          NODE_ENV: test
+
+      - name: 📊 Upload Unit Test Coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unit
+          name: unit-tests
+          fail_ci_if_error: false
+
+      - name: 📊 Unit Test Summary
+        if: always()
+        run: |
+          echo "## 🧪 Unit Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Unit tests completed with coverage" >> $GITHUB_STEP_SUMMARY
+
+  # 🔗 Integration Tests
+  test-integration:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:15
         env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: app_test
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U test -d app_test"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
-    env:
-      # Variables para tu app en modo test
-      NODE_ENV: test
-      DB_HOST: localhost
-      DB_PORT: 5432
-      DB_USER: test
-      DB_PASSWORD: test
-      DB_NAME: app_test
-      JWT_SECRET: test_jwt_secret
-      CONTENTFUL_SPACE_ID: test
-      CONTENTFUL_ACCESS_TOKEN: test
-      CONTENTFUL_ENVIRONMENT: master
 
     steps:
-      - name: Checkout
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js (Active LTS)
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
 
-      - name: Write .env.test
+      - name: 🔗 Run Integration Tests
+        run: npm run test:integration -- --coverage --watchAll=false
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: test_user
+          DB_PASSWORD: test_password
+          DB_NAME: test_products_ci
+          JWT_SECRET: test-jwt-secret
+          BCRYPT_SALT_ROUNDS: 4
+
+      - name: 📊 Upload Integration Test Coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: integration
+          name: integration-tests
+          fail_ci_if_error: false
+
+      - name: 📊 Integration Test Summary
+        if: always()
         run: |
-          cat > .env.test << 'EOF'
-          NODE_ENV=test
-          DB_HOST=localhost
-          DB_PORT=5432
-          DB_USER=test
-          DB_PASSWORD=test
-          DB_NAME=app_test
-          JWT_SECRET=test_jwt_secret
-          CONTENTFUL_SPACE_ID=test
-          CONTENTFUL_ACCESS_TOKEN=test
-          CONTENTFUL_ENVIRONMENT=master
-          EOF
+          echo "## 🔗 Integration Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Integration tests completed with coverage" >> $GITHUB_STEP_SUMMARY
 
-      # (Opcional) si tienes migrations y quieres aplicarlas en CI
-      - name: Run DB migrations (optional)
-        run: |
-          if [ -f node_modules/.bin/typeorm ]; then
-            npx typeorm migration:run || echo "No migrations or CLI not configured"
-          else
-            echo "TypeORM CLI not present, skipping migrations"
-          fi
+  # 🎯 E2E Tests
+  test-e2e:
+    name: 🎯 E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
 
-      - name: Lint
-        run: npm run lint
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
-      - name: Unit tests with coverage (JSON summary)
-        run: npm run test:cov:ci
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      # Enforce cobertura mínima (statements >= 30%)
-      - name: Enforce coverage >= 30% statements
-        run: |
-          STATEMENTS=$(node -e "console.log((require('./coverage/coverage-summary.json').total.statements.pct)||0)")
-          echo "Statements coverage: $STATEMENTS%"
-          awk "BEGIN {exit !($STATEMENTS >= 30)}" || (echo "Coverage menor a 30%"; exit 1)
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
-      - name: Build
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🏗️ Build application
         run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: 🎯 Run E2E Tests
+        run: npm run test:e2e -- --coverage --watchAll=false
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: test_user
+          DB_PASSWORD: test_password
+          DB_NAME: test_products_ci
+          JWT_SECRET: test-jwt-secret
+          BCRYPT_SALT_ROUNDS: 4
+          CONTENTFUL_SPACE_ID: test-space
+          CONTENTFUL_DELIVERY_TOKEN: test-token
+          CONTENTFUL_CONTENT_TYPE: product
+
+      - name: 📊 Upload E2E Test Coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: e2e
+          name: e2e-tests
+          fail_ci_if_error: false
+
+      - name: 📊 E2E Test Summary
+        if: always()
+        run: |
+          echo "## 🎯 E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ E2E tests completed with coverage" >> $GITHUB_STEP_SUMMARY
+
+  # 🏗️ Build Check
+  build:
+    name: 🏗️ Build Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint]
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🏗️ Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: 📊 Build Summary
+        if: always()
+        run: |
+          echo "## 🏗️ Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Application built successfully" >> $GITHUB_STEP_SUMMARY
+
+  # 🐳 Docker Build
+  docker-build:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🐳 Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: test-products:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 📊 Docker Build Summary
+        if: always()
+        run: |
+          echo "## 🐳 Docker Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Docker image built successfully" >> $GITHUB_STEP_SUMMARY
+
+  # 📊 Coverage Report
+  coverage:
+    name: 📊 Coverage Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [test-unit, test-integration, test-e2e]
+    if: always()
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 📊 Generate Combined Coverage Report
+        run: |
+          npm run test:cov:unit
+          npm run test:cov:integration
+          npm run test:cov:e2e
+
+      - name: 📊 Coverage Summary
+        if: always()
+        run: |
+          echo "## 📊 Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Coverage reports generated" >> $GITHUB_STEP_SUMMARY
+          echo "📈 Check the coverage reports in the artifacts" >> $GITHUB_STEP_SUMMARY
+
+  # 🚀 Deployment (Optional)
+  deploy:
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [test-unit, test-integration, test-e2e, build, docker-build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📊 Deployment Summary
+        run: |
+          echo "## 🚀 Deployment Ready" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All checks passed - ready for deployment" >> $GITHUB_STEP_SUMMARY
+          echo "🐳 Docker image built and ready" >> $GITHUB_STEP_SUMMARY

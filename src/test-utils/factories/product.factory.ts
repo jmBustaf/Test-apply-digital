@@ -1,4 +1,3 @@
-// product.factory.ts - Factory especializada para Product
 import { Product } from '../../products/entities/product.entity';
 import { PercentActiveDto, PriceFlag, DateField } from '../../products/dto/percent-active.dto';
 
@@ -87,13 +86,12 @@ export class ProductFactory {
     return {
       from: '2024-01-01',
       to: '2024-01-31',
-      hasPrice: PriceFlag.ALL,
+      hasPrice: PriceFlag.ANY,
       dateField: DateField.CREATED,
       ...overrides,
     };
   }
 
-  // Reset counter for consistent test data
   static reset() {
     this.idCounter = 1;
   }
