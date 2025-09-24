@@ -42,7 +42,6 @@ describe('App E2E Tests', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    // Seed test data
     const userRepository = moduleFixture.get('UserRepository');
     const productRepository = moduleFixture.get('ProductRepository');
 
@@ -63,7 +62,6 @@ describe('App E2E Tests', () => {
     ];
     await productRepository.save(testProducts);
 
-    // Get auth token
     const authResponse = await request(app.getHttpServer()).post('/api/v1/auth/login').send({
       userName: 'e2etestuser',
       password: 'plainpassword',
@@ -83,7 +81,6 @@ describe('App E2E Tests', () => {
 
   describe('Authentication Flow', () => {
     it('should complete full authentication flow', async () => {
-      // Test login
       const loginResponse = await request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({
@@ -102,7 +99,6 @@ describe('App E2E Tests', () => {
         },
       });
 
-      // Test protected endpoint with token
       const protectedResponse = await request(app.getHttpServer())
         .get('/api/v1/products/by-name')
         .query({ name: 'test', page: 1, limit: 10 })
@@ -115,7 +111,6 @@ describe('App E2E Tests', () => {
 
   describe('Product Search Flow', () => {
     it('should complete full product search flow', async () => {
-      // Search by name
       const nameResponse = await request(app.getHttpServer())
         .get('/api/v1/products/by-name')
         .query({ name: 'E2E Test', page: 1, limit: 10 })
@@ -125,7 +120,6 @@ describe('App E2E Tests', () => {
       expect(nameResponse.body.data.length).toBeGreaterThan(0);
       expect(nameResponse.body.meta.totalItems).toBeGreaterThan(0);
 
-      // Search by category
       const categoryResponse = await request(app.getHttpServer())
         .get('/api/v1/products/by-category')
         .query({ category: 'Electronics', page: 1, limit: 10 })
@@ -134,7 +128,6 @@ describe('App E2E Tests', () => {
 
       expect(categoryResponse.body.data.length).toBeGreaterThan(0);
 
-      // Search by price range
       const priceResponse = await request(app.getHttpServer())
         .get('/api/v1/products/by-price-range')
         .query({ minPrice: 0, maxPrice: 1000, page: 1, limit: 10 })
@@ -147,7 +140,6 @@ describe('App E2E Tests', () => {
 
   describe('Analytics Flow', () => {
     it('should complete analytics flow', async () => {
-      // Get percent deleted
       const deletedResponse = await request(app.getHttpServer())
         .get('/api/v1/products/percent-deleted')
         .set('Authorization', `Bearer ${authToken}`)
@@ -155,7 +147,6 @@ describe('App E2E Tests', () => {
 
       expect(deletedResponse.body.data.percentDeleted).toMatch(/^\d+%$/);
 
-      // Get percent active
       const activeResponse = await request(app.getHttpServer())
         .get('/api/v1/products/percent-active')
         .set('Authorization', `Bearer ${authToken}`)

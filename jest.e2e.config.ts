@@ -1,4 +1,3 @@
-// jest.e2e.config.ts - Configuración para tests E2E
 import type { Config } from 'jest';
 
 const config: Config = {
@@ -51,7 +50,7 @@ const config: Config = {
   },
   setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
   testTimeout: 60000,
-  maxWorkers: 1, // Run E2E tests sequentially
+  maxWorkers: 1,
 };
 
 export default config;

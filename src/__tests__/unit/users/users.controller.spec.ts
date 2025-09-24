@@ -44,7 +44,4 @@ describe('UsersController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
-
-  // UsersController doesn't have any public methods, only constructor injection
-  // This test verifies the controller is properly instantiated with its dependencies
 });

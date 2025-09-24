@@ -91,7 +91,7 @@ export class DtoFactory {
     return {
       from: '2024-01-01',
       to: '2024-01-31',
-      hasPrice: PriceFlag.ALL,
+      hasPrice: PriceFlag.ANY,
       dateField: DateField.CREATED,
       ...overrides,
     } as PercentActiveDto;

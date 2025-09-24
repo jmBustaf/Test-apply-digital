@@ -2,11 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../users/entities/user.entity';
-import { Product } from '../products/entities/product.entity';
-import { mockDeep, mockReset, DeepMockProxy } from 'jest-mock-extended';
+import { User } from '../../users/entities/user.entity';
+import { Product } from '../../products/entities/product.entity';
+import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 
-export type MockRepository<T = any> = DeepMockProxy<Repository<T>>;
+export type MockRepository<T extends Record<string, any> = any> = DeepMockProxy<Repository<T>>;
 
 export class TestModuleBuilder {
   private providers: any[] = [];
@@ -107,7 +107,7 @@ export class TestAssertionHelpers {
     method: string,
     ...args: any[]
   ) {
-    expect(repository[method]).toHaveBeenCalledWith(...args);
+    expect((repository as any)[method]).toHaveBeenCalledWith(...args);
   }
 
   static expectRepositoryToBeCalledTimes(
@@ -115,7 +115,7 @@ export class TestAssertionHelpers {
     method: string,
     times: number,
   ) {
-    expect(repository[method]).toHaveBeenCalledTimes(times);
+    expect((repository as any)[method]).toHaveBeenCalledTimes(times);
   }
 }
 

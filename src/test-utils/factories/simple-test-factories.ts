@@ -1,7 +1,7 @@
-import { User, Role } from '../users/entities/user.entity';
-import { Product } from '../products/entities/product.entity';
-import { CreateUserDto } from '../users/dto/create-user.dto';
-import { LoginDto } from '../auth/dto/login.dto';
+import { User, Role } from '../../users/entities/user.entity';
+import { Product } from '../../products/entities/product.entity';
+import { CreateUserDto } from '../../users/dto/create-user.dto';
+import { LoginDto } from '../../auth/dto/login.dto';
 
 export class SimpleUserFactory {
   static create(overrides: Partial<User> = {}): User {

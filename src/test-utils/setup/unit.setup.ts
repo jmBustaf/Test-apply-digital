@@ -1,11 +1,8 @@
-// unit.setup.ts - Setup para tests unitarios
 import 'reflect-metadata';
 import { resetAllMocks } from '../helpers/test-assertions.helper';
 
-// Increase timeout for unit tests
 jest.setTimeout(10000);
 
-// Mock console methods to reduce noise in tests
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 
@@ -40,7 +37,6 @@ beforeEach(() => {
   resetAllMocks();
 });
 
-// Global test utilities for unit tests
 declare global {
   namespace jest {
     interface Matchers<R> {
@@ -50,7 +46,6 @@ declare global {
   }
 }
 
-// Custom Jest matchers for unit tests
 expect.extend({
   toBeValidJWT(received: string) {
     const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;

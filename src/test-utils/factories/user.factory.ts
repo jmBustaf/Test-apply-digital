@@ -1,4 +1,3 @@
-// user.factory.ts - Factory especializada para User
 import { User, Role } from '../../users/entities/user.entity';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { LoginDto } from '../../auth/dto/login.dto';
@@ -31,7 +30,7 @@ export class UserFactory {
 
   static createAdmin(overrides: Partial<User> = {}): User {
     return this.create({
-      role: Role.ADMIN,
+      role: Role.USER,
       userName: 'admin',
       ...overrides,
     });
@@ -72,7 +71,6 @@ export class UserFactory {
     };
   }
 
-  // Reset counter for consistent test data
   static reset() {
     this.idCounter = 1;
   }
