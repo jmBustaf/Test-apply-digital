@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UsersService } from 'src/users/users.service';
-import { JwtPayload } from 'src/interfaces/models.interface';
-import { IReponsesDefault } from 'config/response.interface';
+import { UsersService } from '../users/users.service';
+import { JwtPayload } from '../interfaces/models.interface';
+import { IReponsesDefault } from '../../config/response.interface';
 import { AuthResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
 

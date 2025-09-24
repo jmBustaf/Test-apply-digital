@@ -16,7 +16,7 @@ import {
   ApiExtraModels,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'config/strategies/jwt-auth.guard';
+import { JwtAuthGuard } from '../../config/strategies/jwt-auth.guard';
 import { ProductDto } from './dto/product.dto';
 
 @ApiTags('products')

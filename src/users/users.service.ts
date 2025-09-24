@@ -27,7 +27,7 @@ export class UsersService {
       if (existing) {
         const ok = await bcrypt.compare(plainPassword, existing.password);
         if (!ok) throw new UnauthorizedException('Invalid credentials');
-        const { password: _pw, ...safe } = existing;
+        const { password: _, ...safe } = existing;
         return safe as User;
       }
 
@@ -55,7 +55,7 @@ export class UsersService {
       const ok = await bcrypt.compare(plainPassword, now.password);
       if (!ok) throw new UnauthorizedException('Invalid credentials');
 
-      const { password: _pw, ...safe } = now;
+      const { password: _, ...safe } = now;
       return safe as User;
     }
   }
