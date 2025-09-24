@@ -1,4 +1,4 @@
-# 🚀 Test Products API
+# Test Products API
 
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-11.x-red.svg)](https://nestjs.com/)
@@ -10,26 +10,26 @@
 
 > **API REST para gestión de productos con sincronización automática desde Contentful, módulos público y privado, autenticación JWT y reportes avanzados.**
 
-## 📋 Tabla de Contenidos
+## Tabla de Contenidos
 
-- [🎯 Descripción del Proyecto](#-descripción-del-proyecto)
-- [🏗️ Stack Tecnológico](#️-stack-tecnológico)
-- [✨ Funcionalidades Implementadas](#-funcionalidades-implementadas)
-- [🚀 Instalación y Configuración](#-instalación-y-configuración)
-- [📚 Documentación de API](#-documentación-de-api)
-- [🧪 Testing y Cobertura](#-testing-y-cobertura)
-- [🔧 Scripts Disponibles](#-scripts-disponibles)
-- [📁 Estructura del Proyecto](#-estructura-del-proyecto)
-- [🔐 Variables de Entorno](#-variables-de-entorno)
-- [📊 Reportes y Métricas](#-reportes-y-métricas)
-- [🤝 Contribución](#-contribución)
-- [📞 Contacto](#-contacto)
+- [ Descripción del Proyecto](#-descripción-del-proyecto)
+- [ Stack Tecnológico](#️-stack-tecnológico)
+- [ Funcionalidades Implementadas](#-funcionalidades-implementadas)
+- [ Instalación y Configuración](#-instalación-y-configuración)
+- [ Documentación de API](#-documentación-de-api)
+- [ Testing y Cobertura](#-testing-y-cobertura)
+- [ Scripts Disponibles](#-scripts-disponibles)
+- [ Estructura del Proyecto](#-estructura-del-proyecto)
+- [ Variables de Entorno](#-variables-de-entorno)
+- [ Reportes y Métricas](#-reportes-y-métricas)
+- [ Contribución](#-contribución)
+- [ Contacto](#-contacto)
 
-## 🎯 Descripción del Proyecto
+##  Descripción del Proyecto
 
 **Test Products API** es una solución backend robusta que implementa un sistema completo de gestión de productos con las siguientes características principales:
 
-### 🔄 **Sincronización Automática**
+###  **Sincronización Automática**
 - **Sincronización cada hora** con Contentful API
 - **Actualización automática** de datos de productos
 - **Manejo inteligente** de conflictos y duplicados
@@ -48,7 +48,7 @@
 - **Análisis de productos activos** con filtros personalizados
 - **Gestión de usuarios** y autenticación segura
 
-## 🏗️ Stack Tecnológico
+##  Stack Tecnológico
 
 | Tecnología | Versión | Propósito |
 |------------|---------|-----------|
@@ -64,9 +64,9 @@
 | **ESLint** | 9.x | Linting de código |
 | **Prettier** | 3.x | Formateo de código |
 
-## ✨ Funcionalidades Implementadas
+##  Funcionalidades Implementadas
 
-### ✅ **Requisitos Principales**
+###  **Requisitos Principales**
 - [x] **Sincronización automática** cada hora con Contentful
 - [x] **API REST** con paginación (máx 5 items por página)
 - [x] **Filtros avanzados** por nombre, categoría y precio
@@ -75,7 +75,7 @@
 - [x] **Autenticación JWT** para módulo privado
 - [x] **Reportes de métricas** avanzados
 
-### ✅ **Requisitos Técnicos**
+###  **Requisitos Técnicos**
 - [x] **Node.js LTS** + NestJS
 - [x] **PostgreSQL** + TypeORM
 - [x] **Swagger** en `/api/v1/docs`
@@ -85,13 +85,13 @@
 - [x] **Docker** (próximamente)
 
 ### 📊 **Métricas de Calidad**
-- **82 tests unitarios** pasando ✅
-- **2 tests de integración** pasando ✅
-- **Cobertura de código >80%** ✅
-- **Linting y formato** automático ✅
-- **Pipeline CI/CD** funcionando ✅
+- **82 tests unitarios** pasando 
+- **2 tests de integración** pasando 
+- **Cobertura de código >80%** 
+- **Linting y formato** automático 
+- **Pipeline CI/CD** funcionando 
 
-## 🚀 Instalación y Configuración
+##  Instalación y Configuración
 
 ### **Prerrequisitos**
 - Node.js 20.x LTS
@@ -164,9 +164,9 @@ npm run start:prod
 - **Swagger UI**: http://localhost:3000/api/v1/docs
 - **API Base**: http://localhost:3000/api/v1
 
-## 📚 Documentación de API
+##  Documentación de API
 
-### **🌐 Módulo Público** (Sin autenticación)
+### ** Módulo Público** (Sin autenticación)
 
 #### **Búsqueda de Productos**
 ```http
@@ -183,7 +183,7 @@ GET /api/v1/products/category?category=electronics&page=1
 GET /api/v1/products/price-range?minPrice=100&maxPrice=500&page=1
 ```
 
-### **🔐 Módulo Privado** (Con JWT)
+### ** Módulo Privado** (Con JWT)
 
 #### **Autenticación**
 ```http
@@ -216,7 +216,7 @@ DELETE /api/v1/products/sku/PRODUCT-SKU-123
 Authorization: Bearer <jwt_token>
 ```
 
-### **📖 Ejemplos de Respuesta**
+### ** Ejemplos de Respuesta**
 
 #### **Búsqueda Exitosa**
 ```json
@@ -256,7 +256,7 @@ Authorization: Bearer <jwt_token>
 }
 ```
 
-## 🧪 Testing y Cobertura
+##  Testing y Cobertura
 
 ### **Ejecutar Tests**
 ```bash
@@ -288,7 +288,7 @@ Los reportes HTML se generan en:
 - `./coverage/integration/` - Tests de integración
 - `./coverage/e2e/` - Tests E2E
 
-## 🔧 Scripts Disponibles
+##  Scripts Disponibles
 
 ```bash
 # Desarrollo
@@ -313,7 +313,7 @@ npm run format             # Prettier
 npm run lint:file          # Lint archivo específico
 ```
 
-## 📁 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 test-products/
@@ -328,6 +328,9 @@ test-products/
 │   │   ├── entities/               # Entidades de base de datos
 │   │   └── dto/                    # DTOs de validación
 │   ├── 📁 users/                   # Módulo de usuarios
+│   │   ├── users.controller.ts     # Controlador público/privado
+│   │   ├── users.service.ts        # Lógica de negocio
+│   │   ├── entities/               # Entidades de base de datos
 │   ├── 📁 integrations/            # Integraciones externas
 │   │   ├── contentful/             # Sincronización con Contentful
 │   │   └── schedule/               # Tareas programadas
@@ -361,7 +364,7 @@ test-products/
 | `NODE_ENV` | Entorno de ejecución | ❌ | `development` |
 | `PORT` | Puerto de la aplicación | ❌ | `3000` |
 
-## 📊 Reportes y Métricas
+##  Reportes y Métricas
 
 ### **1. Porcentaje de Productos Eliminados**
 Calcula el porcentaje de productos que han sido eliminados (soft delete) del total de productos.
@@ -377,7 +380,7 @@ Análisis avanzado de productos activos con filtros:
 - **Tendencias de precios**: Análisis de rangos de precios
 - **Categorías más populares**: Estadísticas por categoría
 
-## 🤝 Contribución
+##  Contribución
 
 ### **GitFlow**
 El proyecto utiliza GitFlow para el control de versiones:
@@ -410,7 +413,7 @@ Utilizamos Conventional Commits para mensajes consistentes:
 - Cobertura mínima del 80%
 - Tests deben pasar en GitHub Actions
 
-## 📞 Contacto
+##  Contacto
 
 **Desarrollador**: [Jose Miguel Bustamante Franco]
 **Email**: [josemiguelbf8@gmail.com]
@@ -419,9 +422,9 @@ Utilizamos Conventional Commits para mensajes consistentes:
 
 ---
 
-## 🎯 **Resumen de Cumplimiento**
+##  **Resumen de Cumplimiento**
 
-### ✅ **Requisitos Técnicos Completados**
+###  **Requisitos Técnicos Completados**
 - [x] Node.js LTS + NestJS
 - [x] PostgreSQL + TypeORM
 - [x] Swagger en `/api/v1/docs`
@@ -429,7 +432,7 @@ Utilizamos Conventional Commits para mensajes consistentes:
 - [x] GitHub Actions CI/CD
 - [x] Conventional Commits + GitFlow
 
-### ✅ **Funcionalidades Implementadas**
+###  **Funcionalidades Implementadas**
 - [x] Sincronización automática cada hora
 - [x] API pública paginada (máx 5 items)
 - [x] Filtros por nombre, categoría, precio
@@ -438,7 +441,7 @@ Utilizamos Conventional Commits para mensajes consistentes:
 - [x] Autenticación JWT
 - [x] Reportes de métricas avanzados
 
-### 🚀 **Próximos Pasos**
+###  **Próximos Pasos**
 - [ ] Dockerización completa
 - [ ] Docker Compose para desarrollo
 - [ ] Despliegue en producción
