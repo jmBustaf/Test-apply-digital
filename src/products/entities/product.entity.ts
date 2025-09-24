@@ -2,8 +2,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
   Index,
   ValueTransformer,
@@ -64,9 +62,9 @@ export class Product {
   @DeleteDateColumn({ type: 'timestamptz', name: 'deleted_at', nullable: true })
   deletedAt!: Date | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
-  createdAt!: Date;
+  @Column({ type: 'timestamptz', name: 'created_at', nullable: true })
+  createdAt!: Date | null;
 
-  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at' })
-  updatedAt!: Date;
+  @Column({ type: 'timestamptz', name: 'updated_at', nullable: true })
+  updatedAt!: Date | null;
 }

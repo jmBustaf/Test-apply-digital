@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 
 const PAGE_SIZE = 5;
@@ -7,7 +7,7 @@ const PAGE_SIZE = 5;
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @Get('by-name')
+  @Get('name')
   async getByName(@Query('name') name?: string, @Query('page') page?: string) {
     if (!name) throw new BadRequestException('El parámetro "name" es requerido');
 
@@ -19,7 +19,7 @@ export class ProductsController {
     });
   }
 
-  @Get('by-category')
+  @Get('category')
   async getByCategory(@Query('category') category?: string, @Query('page') page?: string) {
     if (!category) throw new BadRequestException('El parámetro "category" es requerido');
 
@@ -31,7 +31,7 @@ export class ProductsController {
     });
   }
 
-  @Get('by-price-range')
+  @Get('price-range')
   async getByPriceRange(
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
@@ -53,6 +53,12 @@ export class ProductsController {
       page: p,
       limit: PAGE_SIZE,
     });
+  }
+
+  @Delete('sku/:sku')
+  async softDeleteBySku(@Param('sku') sku?: string) {
+    if (!sku) throw new BadRequestException('El parámetro "sku" es requerido');
+    return this.productsService.softDeleteBySku(sku.trim());
   }
 
   private parsePage(page?: string): number {
