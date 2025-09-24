@@ -1,12 +1,12 @@
 import { Controller, Post } from '@nestjs/common';
-import { ContentfulSyncService } from './contentful.sync.service';
+import { ContentfulService } from './contentful.service';
 
-@Controller('contentful/sync')
-export class ContentfulSyncController {
-  constructor(private readonly syncService: ContentfulSyncService) {}
+@Controller('contentful')
+export class ContentfulController {
+  constructor(private readonly service: ContentfulService) {}
 
   @Post()
   run() {
-    return this.syncService.syncAll();
+    return this.service.syncAll();
   }
 }

@@ -1,16 +1,16 @@
 import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs', 'dist', 'test/**', 'src/**/*.spec.ts'],
+    ignores: ['dist', 'coverage', 'test/**', 'src/**/*.spec.ts'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
   {
+    files: ['**/*.ts'],
     languageOptions: {
       sourceType: 'module',
       globals: {
@@ -22,11 +22,6 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
-  },
-  {
-    files: ['src/**/*.dto.ts'],
-  },
-  {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
@@ -36,5 +31,6 @@ export default tseslint.config(
       // '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports' }],
       // 'no-console': ['warn', { allow: ['error', 'warn', 'info'] }],
     },
-  }, 
+  },
+  prettierRecommended,
 );

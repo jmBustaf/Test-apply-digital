@@ -1,48 +1,27 @@
-import {
-  Controller,
-  Get,
-  Query,
-  Delete,
-  Param,
-  DefaultValuePipe,
-  ParseIntPipe,
-  ValidationPipe,
-  UsePipes,
-} from '@nestjs/common';
+import { Controller, Get, Query, Delete, Param } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { PriceRangeDto } from './dto/price-range.dto';
 import { PercentActiveDto } from './dto/percent-active.dto';
+import { ByNameDto } from './dto/by-name.dto';
+import { ByCategoryDto } from './dto/by-category.dto';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get('by-name')
-  getByName(
-    @Query('name') name: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(5), ParseIntPipe) limit: number,
-  ) {
-    return this.productsService.findByName({ name, page, limit });
+  getByName(@Query() dto: ByNameDto) {
+    return this.productsService.findByName(dto);
   }
 
   @Get('by-category')
-  getByCategory(
-    @Query('category') category: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(5), ParseIntPipe) limit: number,
-  ) {
-    return this.productsService.findByCategory({ category, page, limit });
+  getByCategory(@Query() dto: ByCategoryDto) {
+    return this.productsService.findByCategory(dto);
   }
 
   @Get('by-price-range')
   getByPriceRange(@Query() dto: PriceRangeDto) {
-    return this.productsService.findByPriceRange({
-      minPrice: dto.minPrice,
-      maxPrice: dto.maxPrice,
-      page: dto.page ?? 1,
-      limit: dto.limit ?? 5,
-    });
+    return this.productsService.findByPriceRange(dto);
   }
 
   //
@@ -53,10 +32,11 @@ export class ProductsController {
 
   //
   @Get('percent-active')
-  @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }))
   getPercentActive(@Query() dto: PercentActiveDto) {
     return this.productsService.getPercentActive(dto);
   }
+
+  //
 
   @Delete('sku/:sku')
   softDeleteBySku(@Param('sku') sku: string) {

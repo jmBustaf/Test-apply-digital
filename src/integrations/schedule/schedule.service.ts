@@ -1,45 +1,42 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
-import { ContentfulSyncService } from '../contentful/contentful.sync.service';
+import { ContentfulService } from '../contentful/contentful.service';
 
 @Injectable()
 export class ScheduleService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ScheduleService.name);
   private running = false;
-  private jobName: string;
-  private intervalMs: number;
+  private readonly jobName: string;
+  private readonly intervalMs: number;
 
   constructor(
     private readonly scheduler: SchedulerRegistry,
-    private readonly sync: ContentfulSyncService,
-    private readonly config: ConfigService,
+    private readonly sync: ContentfulService,
+    config: ConfigService,
   ) {
-    this.jobName = this.config.get<string>('SYNC_JOB_NAME', 'contentful-hourly-sync');
-    this.intervalMs = this.config.get<number>('SYNC_INTERVAL_MS', 60 * 60 * 1000);
+    this.jobName = config.get<string>('SYNC_JOB_NAME', 'contentful-hourly-sync');
+    this.intervalMs = config.get<number>('SYNC_INTERVAL_MS', 60 * 60 * 1000);
   }
 
   async onModuleInit() {
     await this.runOnceSafely();
 
-    const interval = setInterval(() => {
-      void this.runOnceSafely();
-    }, this.intervalMs);
-
+    const interval = setInterval(() => void this.runOnceSafely(), this.intervalMs);
     this.scheduler.addInterval(this.jobName, interval);
-    this.logger.log(`Scheduled ${this.jobName} every ${this.intervalMs / 1000}s from now.`);
+    this.logger.log(`Scheduled "${this.jobName}" every ${Math.round(this.intervalMs / 60000)}m`);
   }
 
   onModuleDestroy() {
     if (this.scheduler.doesExist('interval', this.jobName)) {
       this.scheduler.deleteInterval(this.jobName);
-      this.logger.log(`Cleared interval ${this.jobName} on shutdown.`);
+      this.logger.log(`Cleared interval "${this.jobName}" on shutdown`);
     }
   }
 
   private async runOnceSafely(): Promise<void> {
     if (this.running) {
-      this.logger.warn('Skip: sync already running.');
+      this.logger.warn('Skip: sync already running');
       return;
     }
     this.running = true;

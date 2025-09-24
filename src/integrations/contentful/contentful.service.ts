@@ -1,56 +1,66 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ContentfulClientApi, Entry, EntrySkeletonType } from 'contentful';
+import { ContentfulClientApi, EntrySkeletonType } from 'contentful';
+import { ConfigService } from '@nestjs/config';
 import { CONTENTFUL_CLIENT } from './contentful.module';
 import { Product } from 'src/products/entities/product.entity';
 import { mapContentfulToProduct } from './mappers/product.mapper';
 import { ContentfulProductFields } from './types/product-fields.type';
 
-const CONTENT_TYPE_PRODUCT = 'product' as const;
+type CFClient = ContentfulClientApi<undefined>;
+
+const PAGE_SIZE = 100;
+type AllowedOrder =
+  | 'sys.createdAt'
+  | '-sys.createdAt'
+  | 'sys.updatedAt'
+  | '-sys.updatedAt'
+  | 'sys.contentType.sys.id'
+  | '-sys.contentType.sys.id';
+const ORDER: AllowedOrder[] = ['sys.createdAt'];
+const DEFAULT_CONTENT_TYPE_PRODUCT = 'product' as const;
 
 interface ProductSkeleton extends EntrySkeletonType {
-  contentTypeId: typeof CONTENT_TYPE_PRODUCT;
+  contentTypeId: string;
   fields: ContentfulProductFields;
 }
 
-type CFClient = ContentfulClientApi<undefined>;
-
 @Injectable()
-export class ContentfulSyncService {
-  private readonly logger = new Logger(ContentfulSyncService.name);
+export class ContentfulService {
+  private readonly logger = new Logger(ContentfulService.name);
+  private readonly contentType: string;
 
   constructor(
     @Inject(CONTENTFUL_CLIENT) private readonly cf: CFClient,
-    @InjectRepository(Product)
-    private readonly productRepo: Repository<Product>,
-  ) {}
+    @InjectRepository(Product) private readonly productRepo: Repository<Product>,
+    config: ConfigService,
+  ) {
+    this.contentType = config.get<string>('CONTENT_TYPE_PRODUCT', DEFAULT_CONTENT_TYPE_PRODUCT);
+  }
 
   async syncAll(): Promise<{ total: number; upserts: number; softDeleted: number }> {
-    const limit = 100;
     let skip = 0;
     let total = 0;
     let upserts = 0;
 
     const incomingIds = new Set<string>();
-    let hasMore = true;
-
     let fetched = 0;
     let completed = true;
 
     try {
-      while (hasMore) {
+      while (true) {
         const res = await this.cf.getEntries<ProductSkeleton>({
-          content_type: CONTENT_TYPE_PRODUCT,
+          content_type: this.contentType,
           skip,
-          limit,
-          order: ['sys.createdAt'],
+          limit: PAGE_SIZE,
+          order: ORDER,
         });
 
         if (skip === 0) total = res.total;
         fetched += res.items.length;
 
-        const toUpsert = res.items.map((entry: Entry<ProductSkeleton, undefined, string>) => {
+        const toUpsert = res.items.map((entry) => {
           const partial = mapContentfulToProduct(
             {
               id: entry.sys.id,
@@ -103,7 +113,8 @@ export class ContentfulSyncService {
         }
 
         skip += res.items.length;
-        hasMore = skip < res.total && res.items.length > 0;
+        const hasMore = skip < res.total && res.items.length > 0;
+        if (!hasMore) break;
       }
     } catch (err) {
       completed = false;
@@ -112,27 +123,19 @@ export class ContentfulSyncService {
 
     let softDeleted = 0;
     if (completed && fetched === total) {
+      const qb = this.productRepo
+        .createQueryBuilder()
+        .update(Product)
+        .set({ isDeleted: true, deletedAt: () => 'NOW()' })
+        .where('"is_deleted" = FALSE')
+        .andWhere('"contentful_id" IS NOT NULL');
+
       if (incomingIds.size > 0) {
-        const idsArray = Array.from(incomingIds);
-        const { affected } = await this.productRepo
-          .createQueryBuilder()
-          .update(Product)
-          .set({ isDeleted: true, deletedAt: () => 'NOW()' })
-          .where('"is_deleted" = FALSE')
-          .andWhere('"contentful_id" IS NOT NULL')
-          .andWhere('"contentful_id" NOT IN (:...ids)', { ids: idsArray })
-          .execute();
-        softDeleted = affected ?? 0;
-      } else {
-        const { affected } = await this.productRepo
-          .createQueryBuilder()
-          .update(Product)
-          .set({ isDeleted: true, deletedAt: () => 'NOW()' })
-          .where('"is_deleted" = FALSE')
-          .andWhere('"contentful_id" IS NOT NULL')
-          .execute();
-        softDeleted = affected ?? 0;
+        qb.andWhere('"contentful_id" NOT IN (:...ids)', { ids: Array.from(incomingIds) });
       }
+
+      const { affected } = await qb.execute();
+      softDeleted = affected ?? 0;
     } else if (!completed) {
       this.logger.warn('Skipping soft-delete sweep because sync did not complete successfully.');
     } else {
