@@ -7,9 +7,9 @@ services:
     container_name: test-products-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-test_products}
+      POSTGRES_DB: ${DB_NAME:-apply_products}
       POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
@@ -18,7 +18,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-test_products}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-apply_products}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,8 +39,8 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      DB_NAME: ${DB_NAME:-test_products}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_NAME: ${DB_NAME:-apply_products}
       
       # Contentful configuration
       CONTENTFUL_SPACE_ID: ${CONTENTFUL_SPACE_ID}
@@ -71,54 +71,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  # Development service (optional)
-  app-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
-    container_name: test-products-app-dev
-    restart: unless-stopped
-    environment:
-      NODE_ENV: development
-      PORT: 3001
-      
-      # Database configuration
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      DB_NAME: ${DB_NAME:-test_products}
-      
-      # Contentful configuration
-      CONTENTFUL_SPACE_ID: ${CONTENTFUL_SPACE_ID}
-      CONTENTFUL_ENVIRONMENT: ${CONTENTFUL_ENVIRONMENT:-master}
-      CONTENTFUL_DELIVERY_TOKEN: ${CONTENTFUL_DELIVERY_TOKEN}
-      CONTENTFUL_CONTENT_TYPE: ${CONTENTFUL_CONTENT_TYPE}
-      
-      # JWT configuration
-      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
-      
-      # Sync job configuration
-      SYNC_JOB_NAME: ${SYNC_JOB_NAME:-contentful-hourly-sync}
-      SYNC_INTERVAL_MS: ${SYNC_INTERVAL_MS:-3600000}
-      
-      # Bcrypt configuration
-      BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS:-10}
-    ports:
-      - "3001:3000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - app-network
-    volumes:
-      - .:/app
-      - /app/node_modules
-    profiles:
-      - dev
 
 volumes:
   postgres_data:
